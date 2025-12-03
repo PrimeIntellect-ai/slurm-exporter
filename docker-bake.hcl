@@ -27,13 +27,5 @@ target "slurm-exporter" {
   tags = [
     "${REGISTRY}/${IMAGE}:${TAG}",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
-}
-
-target "slurm-exporter-dev" {
-  inherits = ["slurm-exporter"]
-  tags = [
-    "${REGISTRY}/${IMAGE}:dev",
-  ]
   platforms = ["linux/amd64"]
 }
