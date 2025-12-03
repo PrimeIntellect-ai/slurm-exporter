@@ -1,0 +1,19 @@
+[project]
+name = "slurm-exporter"
+version = "0.1.0"
+description = "Prometheus exporter for SLURM cluster metrics"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "prometheus-client>=0.21.0",
+]
+
+[project.scripts]
+slurm-exporter = "slurm_exporter.main:main"
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
