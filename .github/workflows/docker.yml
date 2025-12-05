@@ -37,11 +37,11 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "release" ]]; then
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "is_release=true" >> $GITHUB_OUTPUT
+            echo "is_main=false" >> $GITHUB_OUTPUT
           else
             SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
             echo "tag=${SHA_SHORT}" >> $GITHUB_OUTPUT
-            echo "is_release=false" >> $GITHUB_OUTPUT
+            echo "is_main=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push
@@ -55,8 +55,8 @@ jobs:
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE: ${{ env.IMAGE }}
 
-      - name: Push latest tag (release only)
-        if: steps.version.outputs.is_release == 'true'
+      - name: Push latest tag (main branch only)
+        if: steps.version.outputs.is_main == 'true'
         uses: docker/bake-action@v5
         with:
           push: true
