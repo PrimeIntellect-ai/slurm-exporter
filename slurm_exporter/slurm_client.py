@@ -38,7 +38,7 @@ class SlurmClient:
             "squeue",
             "--all",
             "--noheader",
-            "--Format=JobID:|,State:|,UserName:|,Name:|",
+            "--Format=JobID:|,State:|,UserName:|,Name:50|",
         ])
         jobs = []
         for line in output.strip().split("\n"):
