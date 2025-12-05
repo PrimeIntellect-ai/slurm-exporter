@@ -12,7 +12,7 @@ docker run -d \
   -p 9341:9341 \
   -v /etc/slurm:/etc/slurm:ro \
   -v /var/run/munge:/var/run/munge:ro \
-  primeintellect/slurm-exporter:latest \
+  ghcr.io/primeintellect-ai/slurm-exporter:latest \
   --cluster mycluster
 ```
 

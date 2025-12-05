@@ -3,11 +3,11 @@ variable "TAG" {
 }
 
 variable "REGISTRY" {
-  default = "docker.io"
+  default = "ghcr.io"
 }
 
 variable "IMAGE" {
-  default = "primeintellect/slurm-exporter"
+  default = "primeintellect-ai/slurm-exporter"
 }
 
 variable "SLURM_TAG" {

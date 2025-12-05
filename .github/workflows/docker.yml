@@ -8,8 +8,8 @@ on:
     types: [published]
 
 env:
-  REGISTRY: docker.io
-  IMAGE: primeintellect/slurm-exporter
+  REGISTRY: ghcr.io
+  IMAGE: primeintellect-ai/slurm-exporter
   SLURM_TAG: slurm-25-05-3-1
 
 jobs:
@@ -23,17 +23,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set version suffix
         id: version
@@ -46,7 +44,6 @@ jobs:
             echo "is_release=true" >> $GITHUB_OUTPUT
           else
             # Use short commit SHA
-            echo "suffix=${{ github.sha }}" | cut -c1-7 >> $GITHUB_OUTPUT
             SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
             echo "suffix=${SHA_SHORT}" >> $GITHUB_OUTPUT
             echo "is_release=false" >> $GITHUB_OUTPUT
@@ -60,6 +57,8 @@ jobs:
           targets: slurm-exporter
         env:
           TAG: 25-05-${{ steps.version.outputs.suffix }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE: ${{ env.IMAGE }}
           SLURM_TAG: ${{ env.SLURM_TAG }}
 
       - name: Push latest tag (release only)
@@ -71,4 +70,6 @@ jobs:
           targets: slurm-exporter
         env:
           TAG: latest
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE: ${{ env.IMAGE }}
           SLURM_TAG: ${{ env.SLURM_TAG }}
