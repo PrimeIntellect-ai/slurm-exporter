@@ -40,7 +40,7 @@ class SlurmClient:
             "squeue",
             "--all",
             "--noheader",
-            "--Format=JobID:|,State:|,NumCPUs:|,MinMemoryNode:|,NumNodes:|,Gres:|,NodeList:|,Partition:|",
+            "--Format=JobID:|,State:|,UserName:|",
         ])
         jobs = []
         for line in output.strip().split("\n"):
@@ -77,64 +77,15 @@ class SlurmClient:
     def _parse_squeue_line(self, line: str) -> dict[str, Any] | None:
         """Parse a single line from squeue output."""
         parts = line.split("|")
-        if len(parts) < 7:
+        if len(parts) < 3:
             return None
 
         job_id = parts[0].strip()
         if not job_id:
             return None
 
-        mem_str = parts[3].strip()
-        mem_mb = self._parse_memory(mem_str)
-
         return {
             "job_id": job_id,
             "job_state": [parts[1].strip()],
-            "cpus": int(parts[2].strip() or 0),
-            "memory_per_node": {"number": mem_mb},
-            "node_count": {"number": int(parts[4].strip() or 0)},
-            "tres_alloc_str": self._gres_to_tres(parts[5].strip()),
-            "nodelist": parts[6].strip(),
-            "partition": parts[7].strip() if len(parts) > 7 else "",
+            "user": parts[2].strip(),
         }
-
-    def _parse_memory(self, mem_str: str) -> int:
-        """Parse memory string like '4G', '512M', '1T' to MB."""
-        if not mem_str:
-            return 0
-        mem_str = mem_str.upper()
-        try:
-            if mem_str.endswith("T"):
-                return int(float(mem_str[:-1]) * 1024 * 1024)
-            elif mem_str.endswith("G"):
-                return int(float(mem_str[:-1]) * 1024)
-            elif mem_str.endswith("M"):
-                return int(float(mem_str[:-1]))
-            elif mem_str.endswith("K"):
-                return int(float(mem_str[:-1]) / 1024)
-            else:
-                return int(mem_str)
-        except ValueError:
-            return 0
-
-    def _gres_to_tres(self, gres: str) -> str:
-        """Convert GRES format to TRES format for GPU parsing.
-
-        GRES: gpu:a100:2 -> TRES: gres/gpu:a100=2
-        """
-        if not gres or gres == "(null)":
-            return ""
-
-        tres_parts = []
-        for item in gres.split(","):
-            item = item.strip()
-            if not item.startswith("gpu"):
-                continue
-            parts = item.split(":")
-            if len(parts) == 2:
-                # gpu:N
-                tres_parts.append(f"gres/gpu={parts[1]}")
-            elif len(parts) >= 3:
-                # gpu:type:N
-                tres_parts.append(f"gres/gpu:{parts[1]}={parts[2]}")
-        return ",".join(tres_parts)
