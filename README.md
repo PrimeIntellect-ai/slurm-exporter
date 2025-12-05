@@ -40,7 +40,7 @@ uv run slurm-exporter --cluster mycluster --port 9341
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
 | `slurm_nodes` | Gauge | `cluster`, `state` | Number of nodes by state |
-| `slurm_jobs` | Gauge | `cluster`, `state`, `user` | Number of jobs by state and user |
+| `slurm_jobs` | Gauge | `cluster`, `state`, `user`, `name` | Number of jobs by state, user, and name |
 
 ### Node States
 

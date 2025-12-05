@@ -44,8 +44,8 @@ class SlurmCollector(Collector):
     def _collect_job_metrics(self):
         jobs_by_state = GaugeMetricFamily(
             "slurm_jobs",
-            "Number of jobs by state and user",
-            labels=["cluster", "state", "user"],
+            "Number of jobs by state, user, and name",
+            labels=["cluster", "state", "user", "name"],
         )
 
         try:
@@ -54,16 +54,17 @@ class SlurmCollector(Collector):
             print(f"Error fetching jobs: {e}")
             jobs = []
 
-        state_user_counts: dict[tuple[str, str], int] = {}
+        state_user_name_counts: dict[tuple[str, str, str], int] = {}
 
         for job in jobs:
             state = self._parse_job_state(job.get("job_state", []))
             user = job.get("user", "unknown")
-            key = (state, user)
-            state_user_counts[key] = state_user_counts.get(key, 0) + 1
+            name = job.get("name", "unknown")
+            key = (state, user, name)
+            state_user_name_counts[key] = state_user_name_counts.get(key, 0) + 1
 
-        for (state, user), count in state_user_counts.items():
-            jobs_by_state.add_metric([self.cluster_name, state, user], count)
+        for (state, user, name), count in state_user_name_counts.items():
+            jobs_by_state.add_metric([self.cluster_name, state, user, name], count)
 
         yield jobs_by_state
 

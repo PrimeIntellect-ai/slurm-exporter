@@ -34,13 +34,11 @@ class SlurmClient:
 
     def get_jobs(self) -> list[dict[str, Any]]:
         """Fetch all jobs using squeue."""
-        # Get all jobs with specific format for easy parsing
-        # %i=job_id, %T=state, %C=cpus, %m=min_memory, %D=nodes, %b=gres, %N=nodelist
         output = self._run_command([
             "squeue",
             "--all",
             "--noheader",
-            "--Format=JobID:|,State:|,UserName:|",
+            "--Format=JobID:|,State:|,UserName:|,Name:|",
         ])
         jobs = []
         for line in output.strip().split("\n"):
@@ -77,7 +75,7 @@ class SlurmClient:
     def _parse_squeue_line(self, line: str) -> dict[str, Any] | None:
         """Parse a single line from squeue output."""
         parts = line.split("|")
-        if len(parts) < 3:
+        if len(parts) < 4:
             return None
 
         job_id = parts[0].strip()
@@ -88,4 +86,5 @@ class SlurmClient:
             "job_id": job_id,
             "job_state": [parts[1].strip()],
             "user": parts[2].strip(),
+            "name": parts[3].strip(),
         }
