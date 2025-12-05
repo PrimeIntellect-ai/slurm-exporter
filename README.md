@@ -31,6 +31,7 @@ uv run slurm-exporter --cluster mycluster --port 9341
 | Flag | Environment Variable | Default | Description |
 |------|---------------------|---------|-------------|
 | `--port` | `SLURM_EXPORTER_PORT` | `9341` | Port to expose metrics on |
+| `--bind` | `SLURM_EXPORTER_BIND` | `127.0.0.1` | Address to bind to |
 | `--cluster` | `SLURM_CLUSTER_NAME` | `default` | Cluster name label |
 
 ## Metrics

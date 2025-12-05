@@ -21,6 +21,11 @@ def main():
         help="Port to expose metrics on (default: 9341)",
     )
     parser.add_argument(
+        "--bind",
+        default=os.environ.get("SLURM_EXPORTER_BIND", "127.0.0.1"),
+        help="Address to bind to (default: 127.0.0.1)",
+    )
+    parser.add_argument(
         "--cluster",
         default=os.environ.get("SLURM_CLUSTER_NAME", "default"),
         help="Cluster name label (default: default)",
@@ -31,10 +36,10 @@ def main():
     collector = SlurmCollector(slurm_client, args.cluster)
     REGISTRY.register(collector)
 
-    print(f"Starting SLURM exporter on port {args.port}")
+    print(f"Starting SLURM exporter on {args.bind}:{args.port}")
     print(f"Cluster name: {args.cluster}")
 
-    start_http_server(args.port)
+    start_http_server(args.port, addr=args.bind)
 
     while True:
         time.sleep(60)
