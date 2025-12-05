@@ -10,7 +10,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE: primeintellect-ai/slurm-exporter
-  SLURM_TAG: slurm-25-05-3-1
 
 jobs:
   build:
@@ -33,19 +32,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set version suffix
+      - name: Set image tag
         id: version
         run: |
           if [[ "${{ github.event_name }}" == "release" ]]; then
-            # Use release tag (e.g., v0.1.0 -> 0.1.0)
-            TAG="${{ github.ref_name }}"
-            TAG="${TAG#v}"
-            echo "suffix=${TAG}" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "is_release=true" >> $GITHUB_OUTPUT
           else
-            # Use short commit SHA
             SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
-            echo "suffix=${SHA_SHORT}" >> $GITHUB_OUTPUT
+            echo "tag=${SHA_SHORT}" >> $GITHUB_OUTPUT
             echo "is_release=false" >> $GITHUB_OUTPUT
           fi
 
@@ -56,10 +51,9 @@ jobs:
           files: docker-bake.hcl
           targets: slurm-exporter
         env:
-          TAG: 25-05-${{ steps.version.outputs.suffix }}
+          TAG: ${{ steps.version.outputs.tag }}
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE: ${{ env.IMAGE }}
-          SLURM_TAG: ${{ env.SLURM_TAG }}
 
       - name: Push latest tag (release only)
         if: steps.version.outputs.is_release == 'true'
@@ -72,4 +66,3 @@ jobs:
           TAG: latest
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE: ${{ env.IMAGE }}
-          SLURM_TAG: ${{ env.SLURM_TAG }}

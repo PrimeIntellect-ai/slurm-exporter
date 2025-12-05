@@ -10,10 +10,6 @@ variable "IMAGE" {
   default = "primeintellect-ai/slurm-exporter"
 }
 
-variable "SLURM_TAG" {
-  default = "slurm-25-05-3-1"
-}
-
 group "default" {
   targets = ["slurm-exporter"]
 }
@@ -21,9 +17,6 @@ group "default" {
 target "slurm-exporter" {
   context    = "."
   dockerfile = "Dockerfile"
-  args = {
-    SLURM_TAG = "${SLURM_TAG}"
-  }
   tags = [
     "${REGISTRY}/${IMAGE}:${TAG}",
   ]
