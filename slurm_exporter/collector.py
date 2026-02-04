@@ -24,6 +24,12 @@ class SlurmCollector(Collector):
             labels=["cluster", "state"],
         )
 
+        node_state = GaugeMetricFamily(
+            "slurm_node_state",
+            "State of individual SLURM nodes (1 = node is in this state)",
+            labels=["cluster", "node", "state"],
+        )
+
         try:
             nodes = self.slurm_client.get_nodes()
         except Exception as e:
@@ -34,12 +40,17 @@ class SlurmCollector(Collector):
 
         for node in nodes:
             state = self._parse_node_state(node.get("state", []))
+            node_name = node.get("name", "unknown")
+
+            node_state.add_metric([self.cluster_name, node_name, state], 1)
+
             state_counts[state] = state_counts.get(state, 0) + 1
 
         for state, count in state_counts.items():
             nodes_by_state.add_metric([self.cluster_name, state], count)
 
         yield nodes_by_state
+        yield node_state
 
     def _collect_job_metrics(self):
         jobs_by_state = GaugeMetricFamily(
