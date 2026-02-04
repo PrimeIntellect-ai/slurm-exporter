@@ -39,7 +39,8 @@ uv run slurm-exporter --cluster mycluster --port 9341
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
-| `slurm_nodes` | Gauge | `cluster`, `state` | Number of nodes by state |
+| `slurm_nodes` | Gauge | `cluster`, `state` | Number of nodes by state (aggregated) |
+| `slurm_node_state` | Gauge | `cluster`, `node`, `state` | State of individual nodes (1 = node is in this state) |
 | `slurm_jobs` | Gauge | `cluster`, `state`, `user`, `name` | Number of jobs by state, user, and name |
 
 ### Node States
@@ -73,6 +74,12 @@ slurm_nodes{state="idle"}
 
 # Problematic nodes (down, drained)
 slurm_nodes{state=~"down|drained|draining"}
+
+# Individual node states
+slurm_node_state{node="node01"}
+
+# Find which specific nodes are down
+slurm_node_state{state=~"down.*"}
 ```
 
 ## Building
