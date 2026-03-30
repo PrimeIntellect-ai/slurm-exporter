@@ -34,7 +34,7 @@ class SlurmCollector(Collector):
             nodes = self.slurm_client.get_nodes()
         except Exception as e:
             print(f"Error fetching nodes: {e}")
-            nodes = []
+            raise
 
         state_counts: dict[str, int] = {}
 
@@ -63,7 +63,7 @@ class SlurmCollector(Collector):
             jobs = self.slurm_client.get_jobs()
         except Exception as e:
             print(f"Error fetching jobs: {e}")
-            jobs = []
+            raise
 
         state_user_name_counts: dict[tuple[str, str, str], int] = {}
 
