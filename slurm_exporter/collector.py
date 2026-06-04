@@ -1,5 +1,7 @@
 """Prometheus collector for SLURM metrics."""
 
+import os
+
 from prometheus_client.core import GaugeMetricFamily
 from prometheus_client.registry import Collector
 
@@ -33,8 +35,8 @@ class SlurmCollector(Collector):
         try:
             nodes = self.slurm_client.get_nodes()
         except Exception as e:
-            print(f"Error fetching nodes: {e}")
-            raise
+            print(f"Error fetching nodes: {e}", flush=True)
+            os._exit(1)
 
         state_counts: dict[str, int] = {}
 
@@ -62,8 +64,8 @@ class SlurmCollector(Collector):
         try:
             jobs = self.slurm_client.get_jobs()
         except Exception as e:
-            print(f"Error fetching jobs: {e}")
-            raise
+            print(f"Error fetching jobs: {e}", flush=True)
+            os._exit(1)
 
         state_user_name_counts: dict[tuple[str, str, str], int] = {}
 
